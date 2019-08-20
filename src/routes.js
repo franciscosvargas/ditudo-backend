@@ -6,8 +6,11 @@ const Product = require('./controllers/product')
 
 router.post('/register', Auth.registerUser)
 router.post('/auth', Auth.mobileAuthentication)
-router.post('/product/insert', Product.createNewProduct)
+
 router.get('/product/searchbyid', Product.findById)
 router.get('/product/search', Product.searchByKeyword)
+
+router.post('/product', Product.createNewProduct)
+router.put('/product', Product.createNewProduct)
 
 module.exports = router

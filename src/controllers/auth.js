@@ -24,6 +24,7 @@ class Auth {
 	}
 
 	async mobileAuthentication(req, res) {
+		
 		const { email, password } = req.body
 		const user = await User.findOne({ email })
 
