@@ -8,7 +8,6 @@ const User = require('../models/User')
 class Auth {
 	async registerUser(req, res) {
 		try {
-			console.log(req.body)
 			await userNotExists(req.body.email)
 			req.body.password = await encrypt(req.body.password)
 			const user = await User.create(req.body)

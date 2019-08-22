@@ -1,5 +1,5 @@
 const ProductModel = require('../models/Product')
-const CartModel = require('../models/Product')
+const CartModel = require('../models/Chat')
 const fs = require('fs')
 const sharp = require('sharp')
 
@@ -21,7 +21,6 @@ class Product {
 
         const newProduct = await ProductModel.create(req.body)
         
-        console.log(newProduct)
         return res.json(newProduct)
     }
 
@@ -46,9 +45,8 @@ class Product {
     }
 
     async deleteProduct(req, res) {
-        console.log(req.body)
         const search = await ProductModel.findOneAndRemove({'_id':req.body.id, 'owner': req.userId})
-        await CartModel.remove({'product':req.body.id})
+        await CartModel.find({'product':req.body.id}).deleteMany().exec()
 
         return res.send(search)
 
