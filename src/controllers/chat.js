@@ -21,7 +21,12 @@ class Chat {
     }
 
     async findChats(req, res) {
-        const chats = await ChatModel.find( { $or:[ {'buyer': req.userId}, {'owner': req.userId}] } ).populate('product')
+        const chats = await ChatModel.find({ $or: [{ 'buyer': req.userId }, { 'owner': req.userId }] })
+            .populate({
+                path: 'product', populate: {
+                    path: 'owner'
+                }
+            })
         return res.json(chats)
     }
 
@@ -62,7 +67,11 @@ class Chat {
 }
 
 async function chatExists({ product, owner, buyer }) {
-    const chat = await ChatModel.findOne({ product, owner, buyer }).populate('product')
+    const chat = await ChatModel.findOne({ product, owner, buyer }).populate({
+        path: 'product', populate: {
+            path: 'owner'
+        }
+    })
     return chat
 
 }

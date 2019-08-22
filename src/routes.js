@@ -8,6 +8,7 @@ router.post('/register', Auth.registerUser)
 router.post('/auth', Auth.mobileAuthentication)
 
 router.get('/product/searchbyid', Product.findById)
+router.get('/product/search/others', Product.getOthersProducts)
 router.get('/product/search', Product.searchByKeyword)
 
 router.post('/product', Product.createNewProduct)

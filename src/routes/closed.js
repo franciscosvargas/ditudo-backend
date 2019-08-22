@@ -49,6 +49,7 @@ router.use((req, res, next) => {
 router.get('/product/searchbyid', Product.findById)
 router.get('/product/getByOwner', Product.findByOwner)
 router.get('/product/search', Product.searchByKeyword)
+router.get('/product/search/others', Product.getOthersProducts)
 
 router.post('/product', upload.single('image'), Product.createNewProduct)
 router.put('/product', Product.createNewProduct)

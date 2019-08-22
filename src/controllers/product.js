@@ -31,7 +31,7 @@ class Product {
     }
 
     async findByOwner(req, res) {
-        const search = await ProductModel.find({'owner': req.userId})
+        const search = await ProductModel.find({'owner': req.userId}).populate('owner')
 
         return res.json(search)
     }
@@ -39,7 +39,8 @@ class Product {
     async searchByKeyword(req, res) {
         var regex = new RegExp(req.query.keyword, 'i')
         var criteria = { $or: [{ name: regex }] }
-        const search = await ProductModel.find(criteria)
+        const search = await ProductModel.find(criteria).populate('owner').sort({'price': 1})
+
 
         return res.json(search)
     }
@@ -49,7 +50,12 @@ class Product {
         await CartModel.find({'product':req.body.id}).deleteMany().exec()
 
         return res.send(search)
+    }
 
+    async getOthersProducts(req, res) {
+        const products = await ProductModel.find({ _id: {$ne: req.query.id}, 'owner': req.query.owner}).populate('owner')
+        
+        return res.json(products)
     }
 }
 
