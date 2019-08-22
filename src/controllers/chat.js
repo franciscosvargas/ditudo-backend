@@ -21,7 +21,7 @@ class Chat {
     }
 
     async findChats(req, res) {
-        const chats = await ChatModel.find({ 'buyer': req.userId }).populate('product')
+        const chats = await ChatModel.find( { $or:[ {'buyer': req.userId}, {'owner': req.userId}] } ).populate('product')
         return res.json(chats)
     }
 
