@@ -1,4 +1,5 @@
 const ProductModel = require('../models/Product')
+const CartModel = require('../models/Product')
 const fs = require('fs')
 const sharp = require('sharp')
 
@@ -47,6 +48,8 @@ class Product {
     async deleteProduct(req, res) {
         console.log(req.body)
         const search = await ProductModel.findOneAndRemove({'_id':req.body.id, 'owner': req.userId})
+        await CartModel.remove({'product':req.body.id})
+
         return res.send(search)
 
     }
