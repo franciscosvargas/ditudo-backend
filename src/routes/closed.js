@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken')
 const credentials = require('../credentials.json')
 
 const Product = require('../controllers/product')
+const Chat = require('../controllers/chat')
 
 const storage = multer.diskStorage({
     destination(req, file, callback) {
@@ -46,9 +47,15 @@ router.use((req, res, next) => {
 })
 
 router.get('/product/searchbyid', Product.findById)
+router.get('/product/getByOwner', Product.findByOwner)
 router.get('/product/search', Product.searchByKeyword)
 
 router.post('/product', upload.single('image'), Product.createNewProduct)
 router.put('/product', Product.createNewProduct)
+router.delete('/product', Product.deleteProduct)
+
+
+router.get('/chat', Chat.findChats)
+router.post('/chat', Chat.createNewChat)
 
 module.exports = router
