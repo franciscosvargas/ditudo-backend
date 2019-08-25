@@ -24,7 +24,7 @@ io.on('connection', socket => {
 
 
 
-mongoose.connect('mongodb+srv://backend:backendawon@principal-sv9tu.mongodb.net/test?retryWrites=true&w=majority', { useNewUrlParser: true})
+mongoose.connect('mongodb+srv://admin:admin@cluster0-apyqe.mongodb.net/test?retryWrites=true&w=majority', { useNewUrlParser: true})
 
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }))
