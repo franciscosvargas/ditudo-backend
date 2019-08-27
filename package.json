@@ -2,7 +2,7 @@
   "name": "ditudo-backend",
   "version": "1.0.0",
   "main": "src/index.js",
-  "author": "Francisco Vargas",
+  "author": "Alberto",
   "license": "MIT",
   "private": true,
   "scripts": {

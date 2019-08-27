@@ -24,9 +24,7 @@ class Auth {
 			const user = await User.create(req.body)
 
 			user.password = undefined
-			const token = jwt.sign({ id: user._id }, credentials.secret, {
-				expiresIn: 86400
-			})
+			const token = jwt.sign({ id: user._id }, credentials.secret, {})
 
 			return res.json({ user, token })
 		} catch (err) {
