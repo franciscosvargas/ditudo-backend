@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const openRoutes = require('./routes/open')
 const closedRoutes = require('./routes/closed')
+const path = require('path')
 
 const app = express()
 const server = require('http').createServer(app)
@@ -22,16 +23,19 @@ io.on('connection', socket => {
     })
 })
 
-
-
-mongoose.connect('mongodb+srv://admin:admin@cluster0-apyqe.mongodb.net/test?retryWrites=true&w=majority', { useNewUrlParser: true})
+mongoose.connect('mongodb+srv://testes:testes@cluster0-gqpdg.gcp.mongodb.net/test?retryWrites=true&w=majority', { useNewUrlParser: true, useCreateIndex: true})
 
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
+app.get('/uploads/:image', (req, res) => {
+	res.sendFile(path.join(__dirname, `../uploads/${req.params.image}`));
+})
 app.use(openRoutes)
 app.use(closedRoutes)
+
+
 
 // Abrindo servidor na porta padrão ou na porta 3001
 server.listen(process.env.PORT || 3001)

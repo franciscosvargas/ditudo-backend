@@ -6,18 +6,14 @@ const sharp = require('sharp')
 class Product {
 
     async createNewProduct(req, res) {
-        req.body.location = {
-            latitude: req.body.latitude,
-            longitude: req.body.longitude
-        }
-        req.body.owner = req.userId
-        await sharp(req.file.path)
-            .rotate()
-            .resize(400)
-            .toBuffer()
-            .then(buffer => { req.body.image = buffer.toString('base64') })
+        req.body.loc = { type: "Point", coordinates: [parseFloat(req.body.latitude), parseFloat(req.body.longitude)]}
+		
+		req.body.owner = req.userId
+		if(req.file) {
+			req.body.image = `http://localhost:3001/${req.file.path}`
 
-        await fs.unlink(req.file.path, () => { })
+        	//await fs.unlink(req.file.path, () => { })
+		}
 
         const newProduct = await ProductModel.create(req.body)
 
@@ -37,26 +33,40 @@ class Product {
     }
 
     async searchByKeyword(req, res) {
-        var regex = new RegExp(req.query.keyword, 'i')
-        var criteria = { $or: [{ name: regex }] }
-        const search = await ProductModel.find(criteria).populate('owner').sort({ 'price': 1 })
+		var regex = new RegExp(req.query.keyword, 'i')
+		//$or: [{ name: regex }], 
 
-        search.forEach((element) => {
-            const a = distance(parseFloat(req.query.latitude), parseFloat(req.query.longitude), parseFloat(element.location.latitude), parseFloat(element.location.longitude), 'K')
-            element.distance = a
-        })
+		const { latitude, longitude } = req.query
 
-        search.sort(function(a, b) {
-            return parseInt(a.distance) - parseInt(b.distance)
-        })
+		const coords = {
+			latitude: parseFloat(latitude),
+			longitude: parseFloat(longitude)
+		}
+		
+        var criteria = { loc: { $near: { $geometry: {
+			type: "Point" ,
+			coordinates: [ coords.longitude , coords.latitude ]
+		 }, }}}
 
+		//const search = await ProductModel.find(criteria).populate('owner')
 
-
-
+		const search = await ProductModel.aggregate([
+			{
+			  $geoNear: {
+				 near: { type: "Point", coordinates: [ coords.longitude , coords.latitude ] },
+				 distanceField: "dist",
+				 spherical: true,
+				 key: 'loc',
+			  }
+			},
+			{$sort: {price:1, dist:1, }}
+			
+		])
+		
         return res.json(search)
     }
 
-    async deleteProduct(req, res) {
+    async deleteProduct(req, res) { 
         const search = await ProductModel.findOneAndRemove({ '_id': req.body.id, 'owner': req.userId })
         await CartModel.find({ 'product': req.body.id }).deleteMany().exec()
 
