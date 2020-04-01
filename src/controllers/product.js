@@ -10,7 +10,7 @@ class Product {
 		
 		req.body.owner = req.userId
 		if(req.file) {
-			req.body.image = `https://ditudoapi.herokuapp.com/${req.file.path}`
+			req.body.image = `http://localhost:3001/${req.file.path}`
 
         	//await fs.unlink(req.file.path, () => { })
 		}
@@ -42,11 +42,6 @@ class Product {
 			latitude: parseFloat(latitude),
 			longitude: parseFloat(longitude)
 		}
-		
-        var criteria = { loc: { $near: { $geometry: {
-			type: "Point" ,
-			coordinates: [ coords.longitude , coords.latitude ]
-		 }, }}}
 
 		//const search = await ProductModel.find(criteria).populate('owner')
 
@@ -54,14 +49,30 @@ class Product {
 			{
 			  $geoNear: {
 				 near: { type: "Point", coordinates: [ coords.longitude , coords.latitude ] },
+				 key: 'loc',
 				 distanceField: "dist",
 				 spherical: true,
-				 key: 'loc',
+				 
 			  }
 			},
-			{$sort: {price:1, dist:1, }}
+			{$sort: {price:1, dist:1, }},
+			{
+				$lookup: {
+					from: "users",
+					localField: "owner",
+					foreignField: "_id",
+					as: "owner"
+				}
+			},
+			{"$unwind": {
+				"path": "$owner",
+				"preserveNullAndEmptyArrays": true
+			}
+		},
 			
 		])
+		
+		//search.owner = owner
 		
         return res.json(search)
     }
@@ -74,8 +85,7 @@ class Product {
     }
 
     async getOthersProducts(req, res) {
-        const products = await ProductModel.find({ _id: { $ne: req.query.id }, 'owner': req.query.owner }).populate('owner')
-
+		const products = await ProductModel.find({ _id: { $ne: req.query.id }, 'owner': req.query.owner }).populate('owner').limit(20)
         return res.json(products)
     }
 
