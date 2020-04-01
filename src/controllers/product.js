@@ -10,7 +10,7 @@ class Product {
 		
 		req.body.owner = req.userId
 		if(req.file) {
-			req.body.image = `http://localhost:3001/${req.file.path}`
+			req.body.image = `https://ditudoapi.herokuapp.com/${req.file.path}`
 
         	//await fs.unlink(req.file.path, () => { })
 		}
