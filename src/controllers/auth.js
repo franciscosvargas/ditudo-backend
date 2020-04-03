@@ -26,7 +26,7 @@ class Auth {
 
 			return res.json({ user, token })
 		} catch (err) {
-			return res.status(400).send(err)
+			return res.send(err)
 		}
 	}
 
@@ -35,10 +35,10 @@ class Auth {
 		const { email, password } = req.body
 		const user = await User.findOne({ email })
 
-		if (!user) return res.status(401).send({ error: 'Usuário não encontrado' })
+		if (!user) return res.send({ error: 'Usuário não encontrado' })
 
 		if (!(await bcrypt.compare(password, user.password)))
-			return res.status(401).send({ error: 'Senha incorreta.' })
+			return res.send({ error: 'Senha incorreta.' })
 
 		user.password = undefined
 
