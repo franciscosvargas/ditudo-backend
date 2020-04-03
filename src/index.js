@@ -32,6 +32,7 @@ app.use(bodyParser.json())
 app.get('/uploads/:image', (req, res) => {
 	res.sendFile(path.join(__dirname, `../uploads/${req.params.image}`));
 })
+
 app.use(openRoutes)
 app.use(closedRoutes)
 

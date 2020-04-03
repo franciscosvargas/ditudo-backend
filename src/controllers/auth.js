@@ -14,14 +14,11 @@ class Auth {
 			req.body.password = await encrypt(req.body.password)
 
 			if(req.file) {
-				await sharp(req.file.path)
-				.rotate()
-				.resize(150)
-				.toBuffer()
-				.then(buffer => { req.body.image = buffer.toString('base64') })
-
-				await fs.unlink(req.file.path, () => { })
+				req.body.image = `http://localhost:3001/${req.file.path}`
+	
+				//await fs.unlink(req.file.path, () => { })
 			}
+			
 			const user = await User.create(req.body)
 
 			user.password = undefined
