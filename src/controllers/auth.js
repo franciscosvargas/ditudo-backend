@@ -14,7 +14,7 @@ class Auth {
 			req.body.password = await encrypt(req.body.password)
 
 			if(req.file) {
-				req.body.image = `http://localhost:3001/${req.file.path}`
+				req.body.image = `http://35.222.105.40:3001/${req.file.path}`
 	
 				//await fs.unlink(req.file.path, () => { })
 			}
