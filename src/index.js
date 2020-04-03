@@ -36,7 +36,5 @@ app.get('/uploads/:image', (req, res) => {
 app.use(openRoutes)
 app.use(closedRoutes)
 
-
-
 // Abrindo servidor na porta padrão ou na porta 3001
 server.listen(process.env.PORT || 3001)
