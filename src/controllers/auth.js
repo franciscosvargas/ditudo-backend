@@ -35,7 +35,7 @@ class Auth {
 		const { email, password } = req.body
 		const user = await User.findOne({ email })
 
-		if (!user) return res.send({ error: 'Usuário não encontrado' })
+		if (!user) return res.send({ error: 'Nenhum usuário associado a esse email foi encontrado. Crie uma conta.' })
 
 		if (!(await bcrypt.compare(password, user.password)))
 			return res.send({ error: 'Senha incorreta.' })
