@@ -6,18 +6,14 @@ const sharp = require('sharp')
 class Product {
 
     async createNewProduct(req, res) {
-        req.body.location = {
-            latitude: req.body.latitude,
-            longitude: req.body.longitude
-        }
-        req.body.owner = req.userId
-        await sharp(req.file.path)
-            .rotate()
-            .resize(400)
-            .toBuffer()
-            .then(buffer => { req.body.image = buffer.toString('base64') })
+        req.body.loc = { type: "Point", coordinates: [parseFloat(req.body.latitude), parseFloat(req.body.longitude)]}
+		
+		req.body.owner = req.userId
+		if(req.file) {
+			req.body.image = `http://localhost:3001/${req.file.path}`
 
-        await fs.unlink(req.file.path, () => { })
+        	//await fs.unlink(req.file.path, () => { })
+		}
 
         const newProduct = await ProductModel.create(req.body)
 
@@ -37,26 +33,51 @@ class Product {
     }
 
     async searchByKeyword(req, res) {
-        var regex = new RegExp(req.query.keyword, 'i')
-        var criteria = { $or: [{ name: regex }] }
-        const search = await ProductModel.find(criteria).populate('owner').sort({ 'price': 1 })
+		var regex = new RegExp(req.query.keyword, 'i')
+		//$or: [{ name: regex }], 
 
-        search.forEach((element) => {
-            const a = distance(parseFloat(req.query.latitude), parseFloat(req.query.longitude), parseFloat(element.location.latitude), parseFloat(element.location.longitude), 'K')
-            element.distance = a
-        })
+		const { latitude, longitude } = req.query
 
-        search.sort(function(a, b) {
-            return parseInt(a.distance) - parseInt(b.distance)
-        })
+		const coords = {
+			latitude: parseFloat(latitude),
+			longitude: parseFloat(longitude)
+		}
 
+		//const search = await ProductModel.find(criteria).populate('owner')
 
-
-
+		const search = await ProductModel.aggregate([
+			{
+			  $geoNear: {
+				 near: { type: "Point", coordinates: [ coords.longitude , coords.latitude ] },
+				 key: 'loc',
+				 distanceField: "dist",
+				 spherical: true,
+				 
+			  }
+			},
+			{$sort: {price:1, dist:1, }},
+			{
+				$lookup: {
+					from: "users",
+					localField: "owner",
+					foreignField: "_id",
+					as: "owner"
+				}
+			},
+			{"$unwind": {
+				"path": "$owner",
+				"preserveNullAndEmptyArrays": true
+			}
+		},
+			
+		])
+		
+		//search.owner = owner
+		
         return res.json(search)
     }
 
-    async deleteProduct(req, res) {
+    async deleteProduct(req, res) { 
         const search = await ProductModel.findOneAndRemove({ '_id': req.body.id, 'owner': req.userId })
         await CartModel.find({ 'product': req.body.id }).deleteMany().exec()
 
@@ -64,8 +85,7 @@ class Product {
     }
 
     async getOthersProducts(req, res) {
-        const products = await ProductModel.find({ _id: { $ne: req.query.id }, 'owner': req.query.owner }).populate('owner')
-
+		const products = await ProductModel.find({ _id: { $ne: req.query.id }, 'owner': req.query.owner }).populate('owner').limit(20)
         return res.json(products)
     }
 

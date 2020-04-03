@@ -18,6 +18,4 @@ const Auth = require('../controllers/auth')
 router.post('/register', upload.single('image'), Auth.registerUser)
 router.post('/auth', Auth.mobileAuthentication)
 
-
-
 module.exports = router

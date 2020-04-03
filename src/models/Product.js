@@ -7,9 +7,11 @@ const Product = new mongoose.Schema(
         price: { type: Number, require: true },
         description: { type: String},
         owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        location: { type: Object},
+        loc: {type: {}, coordinates: [Number]},
         image: {type: String}
     }
 )
+
+Product.index({loc:'2dsphere'});
 
 module.exports = mongoose.model('Product', Product)

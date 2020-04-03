@@ -13,13 +13,11 @@ class Auth {
 			await userNotExists(req.body.email)
 			req.body.password = await encrypt(req.body.password)
 
-			await sharp(req.file.path)
-				.rotate()
-				.resize(150)
-				.toBuffer()
-				.then(buffer => { req.body.image = buffer.toString('base64') })
-
-			await fs.unlink(req.file.path, () => { })
+			if(req.file) {
+				req.body.image = `http://localhost:3001/${req.file.path}`
+	
+				//await fs.unlink(req.file.path, () => { })
+			}
 			
 			const user = await User.create(req.body)
 
@@ -28,7 +26,6 @@ class Auth {
 
 			return res.json({ user, token })
 		} catch (err) {
-			console.log(err)
 			return res.status(400).send(err)
 		}
 	}
