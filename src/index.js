@@ -23,7 +23,7 @@ io.on('connection', socket => {
     })
 })
 
-mongoose.connect('mongodb+srv://testes:testes@cluster0-gqpdg.gcp.mongodb.net/test?retryWrites=true&w=majority', { useNewUrlParser: true, useCreateIndex: true})
+mongoose.connect('mongodb+srv://admin:admin@cluster0-lyfu1.gcp.mongodb.net/test?retryWrites=true&w=majority', { useNewUrlParser: true, useCreateIndex: true})
 
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: true }))
