@@ -34,7 +34,7 @@ class Product {
 
     async searchByKeyword(req, res) {
 		var regex = new RegExp(req.query.keyword, 'i')
-		//$or: [{ name: regex }], 
+        var criteria = { $or: [{ name: regex }] }
 
 		const { latitude, longitude } = req.query
 
@@ -55,6 +55,7 @@ class Product {
 				 
 			  }
 			},
+			{ $match: criteria },
 			{$sort: {price:1, dist:1, }},
 			{
 				$lookup: {
